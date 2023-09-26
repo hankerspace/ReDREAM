@@ -1,0 +1,47 @@
+spring:
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+    gateway:
+      routes:
+        - id: routing-service
+          uri: lb://routing-service
+          predicates:
+            - Path=/api/v2/routing/**
+          filters:
+            - StripPrefix=3
+        - id: vehicle-service
+          uri: lb://vehicle-service
+          predicates:
+            - Path=/api/v2/vehicle/**
+          filters:
+            - StripPrefix=3
+        - id: energy-service
+          uri: lb://energy-service
+          predicates:
+            - Path=/api/v2/energy/**
+          filters:
+            - StripPrefix=3
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v2/auth/**
+          filters:
+            - StripPrefix=3
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v2/user/**
+          filters:
+            - StripPrefix=3
+            
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: application/json,text/css,application/javascript
+    min-response-size: 2048
+
+# Internationalization
+spring.messages.basename: messages/messages

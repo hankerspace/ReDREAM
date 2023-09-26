@@ -1,0 +1,4 @@
+spring.cloud.config.enabled: false
+eureka.client.enabled: false
+spring.autoconfigure.exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+

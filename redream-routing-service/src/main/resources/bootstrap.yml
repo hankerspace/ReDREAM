@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8888
+  application:
+    name: routing-service
+logstash:
+  host: localhost
+  port: 5000
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  cloud:
+    config:
+      uri: http://config-server:8888
+logstash:
+  host: logstash-server
+  port: 5000

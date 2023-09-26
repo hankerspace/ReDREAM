@@ -1,0 +1,149 @@
+# COMMON APPLICATION PROPERTIES
+
+server:
+  # start services on random port by default
+  port: 0
+  # The stop processing uses a timeout which provides a grace period during which existing requests will be allowed to complete but no new requests will be permitted
+  shutdown: graceful
+
+spring:
+  sleuth:
+    sampler:
+      probability: 1.0
+  cloud:
+    config:
+      # Allow the microservices to override the remote properties with their own System properties or config file
+      allow-override: true
+      # Override configuration with any local property source
+      override-none: true
+      # Temporary hack required by the Spring Boot 2 / Spring Cloud Finchley branch
+      # Waiting issue https://github.com/spring-projects/spring-boot/issues/13042
+    refresh:
+      refreshable: false
+
+eureka:
+  instance:
+    preferIpAddress: true
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+
+
+# Logging
+logging.level.org.springframework: INFO
+
+logstash:
+  host: localhost
+  port: 5000
+
+# Metrics
+management:
+  security:
+    enabled: false # Spring Boot 1.5 makes actuator secure by default
+  endpoint:
+    logfile:
+      enabled: true
+      external-file: web.log
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    enabled-by-default: true
+    web:
+      base-path: /
+      exposure:
+        include: '*' # Enable all Actuators and not only the two available by default /health and /info starting Spring Boot 2.0
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+
+keycloak:
+  auth-server-url: http://localhost:8889/auth
+  realm: redream
+  resource: redream-api
+  bearer-only: true
+  enabled: true
+  public-client: true
+        
+redream:
+  api:
+    module-name: ReDream
+    api-version: 1.0
+    description: "This API is designed to manage commutes behavior for ReDream project."
+    contact:
+      name: "xxxx"
+      email: "xxxx"
+      url: "https://www.ciad-lab.fr/"
+  here:
+    api-key: "xxxx"
+  keycloak:
+    client-secret: "xxxx"
+
+  parameters:
+    pedestrianSpeed: 1
+    pedestrianMaxDistance: 2000
+    
+    highSpeedTrainMetersToWattsFactor: 0.5
+    regionalTrainMetersToWattsFactor: 0.28
+    cityTrainMetersToWattsFactor: 0.28
+    busMetersToWattsFactor: 0.15
+    ferryMetersToWattsFactor: 0.5
+    monorailMetersToWattsFactor: 0.25
+
+    highSpeedTrainWattsToLitersFactor: 0.000284972
+    regionalTrainWattsToLitersFactor: 0.000284972
+    cityTrainWattsToLitersFactor: 0.000284972
+    busWattsToLitersFactor: 0.000284972
+    ferryWattsToLitersFactor: 0.000284972
+    monorailWattsToLitersFactor: 0.000284972
+
+    highSpeedTrainLitersToCo2Factor: 2.64
+    regionalTrainLitersToCo2Factor: 2.64
+    cityTrainLitersToCo2Factor: 2.64
+    busLitersToCo2Factor: 2.64
+    ferryLitersToCo2Factor: 2.64
+    monorailLitersToCo2Factor: 2.64
+
+# Chaos Engineering
+---
+spring:
+  config:
+    activate:
+      on-profile: chaos-monkey      
+management.endpoint.chaosmonkey.enabled: true
+chaos:
+  monkey:
+    enabled: true
+    watcher:
+      component: false
+      controller: false
+      repository: false
+      rest-controller: false
+      service: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  zipkin:
+    baseUrl: http://tracing-server:9411
+  boot:
+    admin:
+      client:
+        prefer-ip: true
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-server:8761/eureka/
+logstash:
+  host: logstash-server
+  port: 5000
+keycloak:
+  auth-server-url: http://keycloak-server:8080/auth

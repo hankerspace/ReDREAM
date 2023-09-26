@@ -1,0 +1,305 @@
+version: '3.2'
+
+volumes:
+  postgres_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+services:
+
+  ## Postgres / Keycloack
+
+  postgres-server:
+    image: postgres:14
+    container_name: postgres-server
+    restart: always
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+        volume:
+          nocopy: true
+      - type: bind
+        source: ./docker/postgres/dump.sql
+        target: /docker-entrypoint-initdb.d/dump.sql
+        read_only: true
+    environment:
+      POSTGRES_DB: redream
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: changeme
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - "5432:5432"
+
+  keycloak-server:
+    image: jboss/keycloak:latest
+    container_name: keycloak-server
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres-server
+      DB_PORT: 5432
+      DB_DATABASE: redream
+      DB_USER: sa
+      DB_SCHEMA: public
+      DB_PASSWORD: changeme
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: changeme
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    # To reload a realm export. In our case we use Postgres backup. No need to backup Keycloak
+    #volumes:
+    #  - type: bind
+    #    source: ./docker/keycloak/config/realm-export.json
+    #    target: /opt/jboss/keycloak/imports/realm-export.json
+    #    read_only: true
+    #command: 
+    #  - "-b 0.0.0.0 -Dkeycloak.import=/opt/jboss/keycloak/imports/realm-export.json"
+    ports:
+      - "8889:8080"
+    depends_on:
+      - postgres-server
+  
+  ## Config / Discovery / Admin
+  
+  config-server:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-config-server
+    container_name: config-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+     - "8888:8888"
+
+  discovery-server:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-discovery-server
+    container_name: discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      - config-server
+    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - "8761:8761"
+
+  admin-server:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-admin-server
+    container_name: admin-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - "9090:9090"
+
+  ## ReDream microservices
+  
+  routing-service:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-routing-service
+    container_name: routing-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+     - keycloak-server
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+    - "8081:8081"
+
+  energy-service:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-energy-service
+    container_name: energy-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - "8082:8082"
+
+  vehicle-service:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-vehicle-service
+    container_name: vehicle-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+     - postgres-server
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - "8083:8083"
+
+  auth-service:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-auth-service
+    container_name: auth-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      - config-server
+      - discovery-server
+      - postgres-server
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+      - "8084:8084"
+
+  user-service:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-user-service
+    container_name: user-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      - config-server
+      - discovery-server
+      - postgres-server
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+      - "8085:8085"
+
+  ## Gateway
+  
+  api-gateway:
+    image: isaratech.registry.jetbrains.space/p/redream/redream/redream-api-gateway
+    container_name: api-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - "8080:8080"
+
+  ## Grafana / Prometheus
+
+#  grafana-server:
+#    build: ./docker/grafana
+#    container_name: grafana-server
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 256M
+#    ports:
+#    - "3000:3000"
+#
+#  prometheus-server:
+#    build: ./docker/prometheus
+#    container_name: prometheus-server
+#    volumes:
+#      - type: volume
+#        source: prometheus_data
+#        target: /prometheus
+#        volume:
+#          nocopy: true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 256M
+#    ports:
+#    - "9091:9090"
+    
+  ## Elasticsearch / Logstash / Kibana
+  
+  elasticsearch-server:
+    build:
+      context: ./docker/elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    container_name: elasticsearch-server
+    volumes:
+      - type: bind
+        source: ./docker/elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ELASTIC_PASSWORD: changeme
+
+  logstash-server:
+    build:
+      context: ./docker/logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    container_name: logstash-server
+    volumes:
+      - type: bind
+        source: ./docker/logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./docker/logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch-server
+
+  kibana-server:
+    build:
+      context: ./docker/kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    container_name: kibana-server
+    volumes:
+      - type: bind
+        source: ./docker/kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch-server
+      
+  ## Zipkin
+  
+  tracing-server:
+    image: openzipkin/zipkin
+    container_name: tracing-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+    - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+    ports:
+     - "9411:9411"
+
+
