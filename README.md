@@ -251,7 +251,7 @@ Here are some resources we found useful:
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/hankerspace/ReDREAM/blob/master/LICENSE.txt
+[license-url]: https://github.com/hankerspace/ReDREAM/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/company/redream-energy/
 [product-screenshot]: resources/images/ReDream2.png
