@@ -230,19 +230,36 @@ Project Link: [https://github.com/hankerspace/ReDREAM](https://github.com/redrea
 
 Here are some resources we found useful:
 
-* [Img Shields](https://shields.io)
-* [GitHub Pages](https://pages.github.com)
-* [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
-* [HERE Maps](https://developer.here.com)
-* [Google Maps](https://developers.google.com/maps/documentation/javascript/get-api-key)
-* [Spring Cloud](https://spring.io/projects/spring-cloud)
-* [Netflix OSS](https://oss.netflix.com)
-* [Docker](https://www.docker.com)
-* [Docker Compose](https://docs.docker.com/compose/overview/)
-* [Docker Registry](https://hub.docker.com)
-* [Best Readme Template](https://github.com/othneildrew/Best-README-Template)
-* 
+* ![Spring Logo](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEPauBbMwDF0tjG2W6cgwsFfpBDygQixtiubKoyzc&s) [Spring](https://spring.io) : Spring makes it easy to create Java enterprise applications. It provides everything you need to embrace the Java language in an enterprise environment, including: 
+  * Core technologies like dependency injection and declarative
+    programming.
+  * Infrastructure support in the form of data access and integration,
+    validation, web, and more.
+  * A testing framework.
+  * A rich ecosystem of third-party libraries.
+* [Img Shields](https://shields.io) : Shields are SVGs that you can use in your README to
+  highlight code coverage, dependencies, etc.
+* [GitHub Pages](https://pages.github.com) : GitHub Pages are public webpages hosted and easily published through GitHub.
+* [Font Awesome](https://fontawesome.com) : Font Awesome Icons are incredibly awesome. Available in
+  Font Awesome Free for everyone, or in Font Awesome Pro when you
+  get a license.
+* [React Icons](https://react-icons.github.io/react-icons/search) : Include popular icons in your React projects easily with react-icons, which utilizes ES6 imports that allows you to include only the icons that your project is using.
+* [HERE Maps](https://developer.here.com) : HERE Maps API for JavaScript brings interactivity and rapid customization into your application development, with HERE maps as the foundation.
+* [Google Maps](https://developers.google.com/maps/documentation/javascript/get-api-key) : Google Maps Platform offers a free $200 monthly credit for Maps, Routes, and Places (see Billing Account Credits).
+* [Spring Cloud](https://spring.io/projects/spring-cloud) : Spring Cloud provides tools for developers to quickly build some of the common patterns in distributed systems (e.g. configuration management, service discovery, circuit breakers, intelligent routing, micro-proxy, control bus, one-time tokens, global locks, leadership election, distributed sessions, cluster state).
+* [Netflix OSS](https://oss.netflix.com) : Netflix Open Source Software Center.
+* ![Docker Logo](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLBpk7KJ7XWbUkMLXu0p6wwo1RJZQsFr934cyqVgHn&s) [Docker](https://www.docker.com) : Docker is an open platform for developing, shipping, and running applications.
+* [Docker Compose](https://docs.docker.com/compose/overview/) : Compose is a tool for defining and running multi-container Docker applications.
+* [Docker Registry](https://hub.docker.com) : Docker Hub is the world's easiest way to create, manage, and deliver your teams' container applications.
+* [Best Readme Template](https://github.com/othneildrew/Best-README-Template) : An awesome README template to jumpstart your projects!
+* ![YourKit Logo](https://www.yourkit.com/images/yklogo.png) YourKit supports open source projects with innovative and intelligent tools
+  for monitoring and profiling Java and .NET applications.
+  YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
+  <a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
+  and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>. 
+
+
+
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
